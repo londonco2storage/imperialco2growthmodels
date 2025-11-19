@@ -73,21 +73,38 @@ def _summary_table(model: str, start_year: int, target_year: int, capacity: floa
         if y0 < start_year: y0 = start_year; y1 = start_year + 1
         if y1 > df['Year'].max(): y1 = df['Year'].max(); y0 = y1 - 1
         frac = year_float - y0
-        r0 = float(df.loc[df['Year'] == y0, 'Rate_Gt_per_yr'])
-        r1 = float(df.loc[df['Year'] == y1, 'Rate_Gt_per_yr'])
-        c0 = float(df.loc[df['Year'] == y0, 'Cumulative_Gt'])
-        c1 = float(df.loc[df['Year'] == y1, 'Cumulative_Gt'])
+        tmp_r0 = df.loc[df['Year'] == y0, 'Rate_Gt_per_yr']
+        r0 = float(tmp_r0.iloc[0]) if not tmp_r0.empty else float('nan')
+
+        tmp_r1 = df.loc[df['Year'] == y1, 'Rate_Gt_per_yr']
+        r1 = float(tmp_r1.iloc[0]) if not tmp_r1.empty else float('nan')
+
+        tmp_c0 = df.loc[df['Year'] == y0, 'Cumulative_Gt']
+        c0 = float(tmp_c0.iloc[0]) if not tmp_c0.empty else float('nan')
+
+        tmp_c1 = df.loc[df['Year'] == y1, 'Cumulative_Gt']
+        c1 = float(tmp_c1.iloc[0]) if not tmp_c1.empty else float('nan')
+
         return (c0 + frac*(c1 - c0), r0 + frac*(r1 - r0))
 
     cum_tn, rate_tn = interp_at(tn)
     cum_tp, rate_tp = interp_at(tp)
 
-    storage_target = float(df.loc[df['Year'] == target_year, 'Cumulative_Gt']) if target_year in df['Year'].values else float('nan')
-    rate_target    = float(df.loc[df['Year'] == target_year, 'Rate_Gt_per_yr']) if target_year in df['Year'].values else float('nan')
+    if target_year in df['Year'].values:
+        _st = df.loc[df['Year'] == target_year, 'Cumulative_Gt']
+        storage_target = float(_st.iloc[0]) if not _st.empty else float('nan')
+        _rt = df.loc[df['Year'] == target_year, 'Rate_Gt_per_yr']
+        rate_target = float(_rt.iloc[0]) if not _rt.empty else float('nan')
+    else:
+        storage_target = float('nan')
+        rate_target = float('nan')
 
-    def val_at(y): 
-        if y < start_year or y > df['Year'].max(): return float('nan')
-        return float(df.loc[df['Year'] == y, 'Cumulative_Gt'])
+    def val_at(y):
+        if y < start_year or y > df['Year'].max():
+            return float('nan')
+        _c = df.loc[df['Year'] == y, 'Cumulative_Gt']
+        return float(_c.iloc[0]) if not _c.empty else float('nan')
+    
 
     def calculate_cagr(P_t0, P_t1, t0, t1):
         if P_t0 <= 0 or P_t1 <= 0 or t1 <= t0: return float('nan')
@@ -160,8 +177,11 @@ def build_single_model(
         if y0 < start_year: y0 = start_year; y1 = start_year + 1
         if y1 > yearly_df['Year'].max(): y1 = yearly_df['Year'].max(); y0 = y1 - 1
         frac = tn - y0
-        c0 = float(yearly_df.loc[yearly_df['Year'] == y0, 'Cumulative_Gt'])
-        c1 = float(yearly_df.loc[yearly_df['Year'] == y1, 'Cumulative_Gt'])
+        _tmp0 = yearly_df.loc[yearly_df['Year'] == y0, 'Cumulative_Gt']
+        c0 = float(_tmp0.iloc[0]) if not _tmp0.empty else float('nan')
+
+        _tmp1 = yearly_df.loc[yearly_df['Year'] == y1, 'Cumulative_Gt']
+        c1 = float(_tmp1.iloc[0]) if not _tmp1.empty else float('nan')
         P_tn = c0 + frac*(c1 - c0)
         cagr_to_tn = calculate_cagr(S0, P_tn, start_year, tn)
         if cagr_to_tn == cagr_to_tn and cagr_to_tn > (growth_limit + 1e-12):

@@ -69,8 +69,10 @@ def _summary_from_given_r(model: str, start_year: int, end_year: int, target_yea
         peak_rate = C * r / math.e
 
     def val_at(df, y, col):
-        if y < df['Year'].min() or y > df['Year'].max(): return float('nan')
-        return float(df.loc[df['Year'] == y, col])
+        if y < df['Year'].min() or y > df['Year'].max():
+            return float('nan')
+        _s = df.loc[df['Year'] == y, col]
+        return float(_s.iloc[0]) if not _s.empty else float('nan')
 
     P_target = val_at(yearly, target_year, 'Cumulative_Gt')
     Q_target = val_at(yearly, target_year, 'Rate_Gt_per_yr')
