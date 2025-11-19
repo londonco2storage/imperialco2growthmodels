@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ImperialCO2growthmodel"
+version = "0.1.0"
+description = "CO₂ storage growth modeling (Logistic & Gompertz) with growth constraints, inflection/peak years, and CSV exports."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Xiaowei Gao", email = "xg320@ic.ac.uk"}
+]
+keywords = ["CO2", "carbon storage", "logistic", "gompertz", "growth", "CAGR", "geologic storage"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+  "Typing :: Typed"
+]
+dependencies = [
+  "pandas>=1.3",
+  "numpy>=1.21"
+]
+
+[project.urls]
+Homepage = "https://github.com/londonco2storage/imperialco2growthmodels"
+Issues = "https://github.com/londonco2storage/imperialco2growthmodels/issues"
+
+[tool.setuptools.package-data]
+ImperialCO2growthmodel = ["py.typed"]
+
+[project.scripts]
+imperial-co2-growth = "ImperialCO2growthmodel.cli:main"
